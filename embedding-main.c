@@ -26,10 +26,12 @@ main( int argc, char *argv[] ) // when passing arguments
  // This section is made for argument validation
         if( argc > ARGS ){
 	        printf("Too many arguments supplied.\n");
+		exit(1);
 	}
 	else if (argc < ARGS){
-	        printf("Missed Arguments!!.\n");
+	        printf("Missing Arguments!!.\n");
 		printf("\tExiting...\n \n");
+		exit(1);
 	}
 	else{
 	  printf("the input arguments were : %s %s %s\n",argv[1],argv[2],argv[3]);
