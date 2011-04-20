@@ -4,7 +4,7 @@
 	       argv[2], also the embedding delay as argv[3] of the program
       
   AUTHOR:      Daniel Mejia Raigosa
-  DATE:        16, April 2011
+  DATE:        20, April 2011
   VER:         Makin'
 */
 
@@ -15,8 +15,11 @@
 
 #define ARGS 4  // Here we defines the number of max arguments remember that argv[0] its the program name
 #define TITLESCN "NoLiTiSe" // Program Title
-#define VER  "0.1" // Code Version 
+#define VER  "0.0.1" // Code Version 
 #define ANO "2011" // Date of Code 
+
+
+/* HERE COMES THE MAIN FUNCTION */
 
 main( int argc, char *argv[] ) // when passing arguments
 {
@@ -35,6 +38,7 @@ main( int argc, char *argv[] ) // when passing arguments
 	/* Defining Variables */ 
 
   char destinationfn[20], originfn[20],dinarg[5];
+  double c1,c2,c3;
   int dim,longitud,i;
   
   FILE *origin;         // File handler
@@ -44,12 +48,8 @@ main( int argc, char *argv[] ) // when passing arguments
 
   longitud=strlen(argv[1]);
   strcpy(originfn,argv[1]);
-  
-  origin=fopen(originfn,"r");
-  if (origin==NULL){
-    printf("\n!!! An Error Has Ocurred During File Reading !!!\n");
-  }
 
+  opendatafile(&origin,originfn,"r"); // Data File Handling
 
   printf("origin file name:");
   for(i=0;i<longitud;i++)
@@ -58,5 +58,9 @@ main( int argc, char *argv[] ) // when passing arguments
     }
   printf("\n");
 
+  fscanf(origin,"%lf %lf %lf",&c1,&c2,&c3);
+  fclose(origin);
+  printf("\nCol1: %lf\nCol2: %lf\nCol3: %lf\n",c1,c2,c3);
+  exit(0);
 
 } // End of Main Code

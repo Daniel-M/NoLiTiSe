@@ -4,7 +4,7 @@
       
   AUTHOR:      Daniel Mejia Raigosa
   DATE:        20, April 2011
-  VERSION:     1.0
+  VERSION:     1.1
 */
 
 #include <stdio.h>
@@ -31,7 +31,7 @@ double askvalue(char mensaje[200], double xmin, double xmax)
 
     return x;
    
-}//Fin Pidevalor
+}//end ask value
 
  // adorna ingresando el titulo y numero de caracteres del marco
 void pimpi(char titulo[40],int n)
@@ -52,7 +52,9 @@ void pimpi(char titulo[40],int n)
     
     printf("\\ \n");
 
-}//Fin adornoi
+}//end pimpi
+
+//********************************************************************
 
  // adorna ingresando el titulo y numero de caracteres del marco
 void pimpe(char titulo[40],int n) 
@@ -74,4 +76,42 @@ void pimpe(char titulo[40],int n)
     
     printf("/ \n");
 
-}//Fin adornoi
+}//end pimpe
+
+
+//********************************************************************
+
+
+void opendatafile(FILE **filepointer,char *filename,char *option)
+{
+ 
+/* This Function serves as a file handler wich evitates crashes
+  this function is a kind of remplacement of :
+
+  origin=fopen(originfn,"r"); // open data origin 
+
+  if (origin==NULL){   //handle errors
+    system("clear");
+    printf("===============FATAL ERROR===================="); 
+    printf("\n An Error has ocurred during file reading !!\n");
+    printf(" The file \'%s\' seems to be Unexistent!!\n Exiting...\n",argv[1]);
+    printf("==============================================\n");
+    exit(1);
+  }
+
+*/
+
+/* usage opendatafile(&filepointer,filename,option["r","w"...])*/
+
+*filepointer=fopen(filename,option); // open file
+  if (*filepointer==NULL){   //handle errors
+    system("clear");
+    printf("===============FATAL ERROR===================="); 
+    printf("\n An Error has ocurred during file reading !!\n");
+    printf(" The file \'%s\' seems to be Unexistent!!\n Exiting...\n",filename);
+    printf("==============================================\n");
+    exit(1);
+  }
+
+
+}
