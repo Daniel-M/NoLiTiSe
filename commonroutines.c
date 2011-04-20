@@ -1,9 +1,12 @@
 /*
-   DESCRIPTION: Some routines for practical handling
-   AUTHOR:      Daniel Mejia Raigosa
-   DATE:        19, March 2011
-   VERSION:     1.0
+  FILE NAME:   commonroutines.c
+  DESCRIPTION: This code consist of a collection of useful self-made routines
+      
+  AUTHOR:      Daniel Mejia Raigosa
+  DATE:        20, April 2011
+  VERSION:     1.0
 */
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
