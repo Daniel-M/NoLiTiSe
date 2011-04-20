@@ -1,7 +1,6 @@
 /*
-  DESCRIPTION: This code aims to make an Dynamical Systems Calculation Suite
-               Where one can make embendings, calculate correlation dimension
-	       lyapunov exponents and more.
+  DESCRIPTION: This code consist of a simple embedding process by passing
+               the embedding delay as an argument of the program
       
   AUTHOR:      Daniel Mejia Raigosa
   DATE:        16, April 2011
@@ -13,43 +12,37 @@
 #include <stdlib.h>
 #include "commonroutines.c"
 
-#define ARGS 4  // Here we defines the number of max arguments
+#define ARGS 4  // Here we defines the number of max arguments remember that argv[0] its the program name
 #define TITLESCN "NoLiTiSe" // Program Title
 #define VER  "0.1" // Code Version 
 #define ANO "2011" // Date of Code 
 
- int main(void)
-//main( int argc, char *argv[] ) // when passing arguments
+main( int argc, char *argv[] ) // when passing arguments
 {
-  // Defining Variables
-  char archivef[20]
-  int men;
+ // This section is made for argument validation
+        if( argc > ARGS ){
+	        printf("Too many arguments supplied.\n");
+	}
+	else if (argc < ARGS){
+	        printf("Missed Arguments!!.\n");
+		printf("\tExiting...\n \n");
+	}
+	else{
+	  printf("the input arguments were : %s %s %s\n",argv[1],argv[2],argv[3]);
+	}
 
-  system("clear");
-  pimpi(TITLESCN,30);
-  printf("  NoLiTiSe - Ver %s  %s \n", VER,ANO);
-  printf("  A Tool For Non Linear Time Series Analisys.\n \n");
+	/* Defining Variables */ 
 
-  //  printf("    ");
-  printf(" Whould you like to...\n\t1. Make an Embedding\n\t2. Calculate the Maximum Lyapunov Exponent\n");
-  scanf("%d",&men);
-  if (men>1)
-    { printf("Error!: you haven't selected a right value");
-      exit;
-    }
-  switch(men)
+  char destinationf[20], originf[20],m[5];
+  int dim,longitud,i;
+  longitud=strlen(argv[1]);
+  strcpy(originf,argv[1]);
+  printf("originf:");
+  for(i=0;i<longitud;i++)
     {
-    case 1:
-         {
-	   printf("Entering Embedding Mode...");
-	   printf("What's the filename?");
-	   scanf("%s",&archivef[20]);
-	   *FILE = fopen(archive,"r");
-	 }
+      printf("%c",originf[i]);
     }
-
-  pimpe(TITLESCN,30);
-  exit(0);
+  printf("\n");
 
 
 } // End of Main Code
