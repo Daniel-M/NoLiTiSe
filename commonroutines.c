@@ -1,4 +1,4 @@
-/*
+ /*
   FILE NAME:   commonroutines.c
   DESCRIPTION: This code consist of a collection of useful self-made routines
       

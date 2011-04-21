@@ -9,14 +9,18 @@ below:
 
 
 /*--------------------------------------------------------------------------
+      
   FILE NAME:   embedding-main.c
   DESCRIPTION: This code consist of a simple embedding process by passing 
-               the data file as argv[1] and the resulting embedding on
-	       argv[2], also the embedding delay as argv[3] of the program
+               the data origin file name as argv[1] and the resulting embedding
+	       dimention as argv[2] when executing the program.
+	       the program creates the file "filename-embedding.ext" as a 
+	       result of the successful working.
+	       Max Data handling 10000 data lines 
       
   AUTHOR:      Daniel Mejia Raigosa
-  DATE:        20, April 2011
-  VERSION:     Makin'
+  DATE:        21, April 2011
+  VERSION:     1.1 
 
 -----------------------------------------------------------------------------
 
@@ -25,5 +29,5 @@ below:
       
   AUTHOR:      Daniel Mejia Raigosa
   DATE:        20, April 2011
-  VERSION:     1.0
+  VERSION:     1.1
 ---------------------------------------------------------------------------*/
