@@ -1,4 +1,5 @@
 /*
+  FILE NAME:   embedding-main.c
   DESCRIPTION: This code consist of a simple embedding process by passing 
                the data origin file name as argv[1] and the resulting embedding
 	       dimention as argv[2] when executing the program.
@@ -8,7 +9,7 @@
       
   AUTHOR:      Daniel Mejia Raigosa
   DATE:        21, April 2011
-  VERSION:     1.1 
+  VERSION:     1.2 
 */
 
 #include <stdio.h>
@@ -18,27 +19,10 @@
 
 #define ARGS 3  // Here we defines the number of max arguments remember that argv[0] its the program name
 #define TITLESCN "Embedding" // Program Title
-#define VER  "0.0.1" // Code Version 
+#define VER  "1.2" // Code Version 
 #define ANO "2011" // Date of Code 
 #define CHAPER 20 // Number of allowed characters
 #define MAXDATA 10000  //Maximum Data Input
-
-/* This function Test the correct use of the character number */
-void characternumber(char *caracter)
-{
-  int longitud;
-  longitud=strlen(caracter);
-  if (longitud>CHAPER)
-    {
-    system("clear");
-    printf("===============FATAL ERROR======================="); 
-    printf("\n Max input arguments character allowed are %d\n",CHAPER);
-    printf(" The argument %s \n character lenght was %d !!\n",caracter,longitud);
-    printf(" Please use less charactares to success.\n Exiting...\n");
-    printf("=================================================\n");
-    exit(1);
-    }
-}
 
 
 /* HERE COMES THE MAIN FUNCTION */
@@ -58,21 +42,23 @@ main( int argc, char *argv[] ) // when passing arguments
    }
 
    char resp[0],originfn[CHAPER],dimarg[CHAPER],filename[CHAPER],fileext[CHAPER];
-  float in1[MAXDATA];  //Floating Point
-  int dim,cont,maxcont;
+  double in1[MAXDATA];  //Floating Point
+  int m,dim,cont,maxcont;
   
   FILE *origin;         // File handler
   FILE *destination;
 
   /* Starting Main Code */
 
-  characternumber(argv[1]); //Confirm Character allowed values
-  characternumber(argv[2]);
+  characternumber(argv[1],CHAPER); //Confirm Character allowed values
+  characternumber(argv[2],CHAPER);
 
-  strcpy(originfn,argv[1]);   //Conver file names
+  strcpy(originfn,argv[1]);   //Convert file names
   strcpy(dimarg,argv[2]);
 
   dim=atoi(dimarg);
+
+  double x[MAXDATA][dim]; //Declare the emdending vector
 
   strcpy(filename,strtok(argv[1],".")); // separate data files
   strcpy(fileext,strstr(originfn,"."));
@@ -103,7 +89,7 @@ main( int argc, char *argv[] ) // when passing arguments
       cont=0; //initialize counter
       while(!feof(origin)) //checks if the end of file is reached
 	{
-	  fscanf(origin,"%f\n",&in1[cont]);
+	  fscanf(origin,"%lf\n",&in1[cont]);
 	  cont=cont+1;
 	}
       fclose(origin);
@@ -113,13 +99,32 @@ main( int argc, char *argv[] ) // when passing arguments
       
   /* here comes the embedding proccess */
       
+      for(cont=0;cont<maxcont;cont++)
+	{
+	  for(m=0;m<dim;m++)
+	    {
+	      x[cont][m]=in1[m+cont];
+	    }
+	}
+
+      /* Now make the out put file */
+      
+
+
       for(cont=0;cont<maxcont;cont++) //checks if the end of file is reached
 	{
-	  fprintf(destination,"%f \t %f\n",in1[cont], in1[cont+dim]);
+	  for(m=0;m<dim;m++)
+	    {   
+	      fprintf(destination,"%lf\n",x[cont][m]);
+	    }
+           fprintf(destination,"\n");
 	}
+
       fclose(destination);
 
-      printf("\n\tWrote %d lines on Output File : %s",maxcont,filename);
+      /*  */
+
+      printf("\n\tWrote %d lines on Output File : %s",maxcont*m,filename);
       printf("\n\tEmbedding: %d\n",dim);
       pimpe(TITLESCN,30);
       exit(0);
