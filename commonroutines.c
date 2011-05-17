@@ -4,7 +4,7 @@
       
   AUTHOR:      Daniel Mejia Raigosa
   DATE:        20, April 2011
-  VERSION:     1.1
+  VERSION:     1.2
 */
 
 #include <stdio.h>
@@ -12,7 +12,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-// pide un valor tomando en cuenta el mensaje y el intervalo [xmin,xmax] valida entradas uso var = pidevalor(...)
+
+//***************************************************************************
+
+// Aks a 'double' value on the range [xmin,xmax] by the message mensaje[200]
 double askvalue(char mensaje[200], double xmin, double xmax) 
 {
     double x;
@@ -23,8 +26,8 @@ double askvalue(char mensaje[200], double xmin, double xmax)
 	scanf("%lf",&x);
 	
 	if(x<xmin || x>xmax)
-	  {
-	    printf("Error en el Valor Ingresado,\n Verifique que si este en el rango Valido! [%lf,%lf] \n",xmin,xmax);
+	  {    
+	    printf("\n\tError!!!\n\tThe input value is out of the allowed range [%lf,%lf] \n",xmin,xmax);
 
 	  }
       }while (x<xmin || x>xmax);
@@ -33,7 +36,10 @@ double askvalue(char mensaje[200], double xmin, double xmax)
    
 }//end ask value
 
- // adorna ingresando el titulo y numero de caracteres del marco
+//***************************************************************************
+
+ // Pimp program on the start up
+// usage pimpi(program name,some in number)
 void pimpi(char titulo[40],int n)
 {
     double i;
@@ -56,7 +62,7 @@ void pimpi(char titulo[40],int n)
 
 //********************************************************************
 
- // adorna ingresando el titulo y numero de caracteres del marco
+ // Pimps program on exit, used whit pimpi and as pimpi
 void pimpe(char titulo[40],int n) 
 {
     double i,t;
@@ -104,7 +110,8 @@ void opendatafile(FILE **filepointer,char *filename,char *option)
 /* usage opendatafile(&filepointer,filename,option["r","w"...])*/
 
 *filepointer=fopen(filename,option); // open file
-  if (*filepointer==NULL){   //handle errors
+ if (*filepointer==NULL) //handle reading error 
+    {   
     system("clear");
     printf("===============FATAL ERROR===================="); 
     printf("\n An Error has ocurred during file reading !!\n");
@@ -112,6 +119,53 @@ void opendatafile(FILE **filepointer,char *filename,char *option)
     printf("==============================================\n");
     exit(1);
   }
-
-
 }
+
+
+//*************************************************************************
+
+
+/* This function Test the correct use of the character number */
+void characternumber(char *caracter,int CHAPER)
+{
+  int longitud;
+  longitud=strlen(caracter);
+  if (longitud>CHAPER)
+    {
+    system("clear");
+    printf("===============FATAL ERROR======================="); 
+    printf("\n Max input arguments character allowed are %d\n",CHAPER);
+    printf(" The argument %s \n character lenght was %d !!\n",caracter,longitud);
+    printf(" Please use less charactares to success.\n Exiting...\n");
+    printf("=================================================\n");
+    exit(1);
+    }
+}
+
+
+//*************************************************************************
+
+
+int heaviside(double x)
+{
+
+  /* this is the heaviside step function
+    
+          /
+          | 1  if x >=0
+    H(x)=<
+          | 0  if x < 0
+   	  \
+  */
+  if(x>=0)
+    {
+      return 1;
+    }
+  else if(x<0)
+    {
+      return 0;
+    }
+}
+
+
+//***************************************************************************
