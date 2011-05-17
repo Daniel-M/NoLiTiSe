@@ -3,8 +3,8 @@
   DESCRIPTION: This code consist of a collection of useful self-made routines
       
   AUTHOR:      Daniel Mejia Raigosa
-  DATE:        20, April 2011
-  VERSION:     1.2
+  DATE:        17, May 2011
+  VERSION:     1.4
 */
 
 #include <stdio.h>
