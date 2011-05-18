@@ -5,21 +5,22 @@
 	       dimention as argv[2] when executing the program.
 	       the program creates the file "filename-embedding.ext" as a 
 	       result of the successful working.
-	       Max Data handling 10000 data lines 
+	       Max Data handling 10000 data lines - it can be modified on the
+	       #define MAXDATA value
       
   AUTHOR:      Daniel Mejia Raigosa
-  DATE:        21, April 2011
-  VERSION:     1.2 
+  DATE:        17, May 2011
+  VERSION:     1.3 
 */
 
 #include <stdio.h>
-#include <math.h>
+#include <math.h>ç
 #include <stdlib.h>
 #include "commonroutines.c"
 
 #define ARGS 3  // Here we defines the number of max arguments remember that argv[0] its the program name
 #define TITLESCN "Embedding" // Program Title
-#define VER  "1.2" // Code Version 
+#define VER  "1.3" // Code Version 
 #define ANO "2011" // Date of Code 
 #define CHAPER 20 // Number of allowed characters
 #define MAXDATA 10000  //Maximum Data Input
@@ -87,6 +88,7 @@ main( int argc, char *argv[] ) // when passing arguments
       
       /*  Read Contents on the file originfn and makes an embeding of dimension dim*/
       cont=0; //initialize counter
+
       while(!feof(origin)) //checks if the end of file is reached
 	{
 	  fscanf(origin,"%lf\n",&in1[cont]);
@@ -111,7 +113,7 @@ main( int argc, char *argv[] ) // when passing arguments
       
 
 
-      for(cont=0;cont<maxcont;cont++) //checks if the end of file is reached
+      for(cont=0;cont<maxcont;cont++) //Until the end of file is reached
 	{
 	  for(m=0;m<dim;m++)
 	    {   

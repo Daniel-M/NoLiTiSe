@@ -1,11 +1,14 @@
 /*
   FILE NAME:   correlation-main.c
   DESCRIPTION: This Code calculates the correlation dimention of the data
-               stored on a given file passed by arguments on argv[1]
+               stored on a given file passed by arguments on argv[1], and
+	       with his correlation dimension passed as argv[2].
+	       The Maximum data input is 25000, it can be modified on the
+	       #define MAXDATA
       
   AUTHOR:      Daniel Mejia Raigosa
-  DATE:        24, April 2011
-  VERSION:     0.1
+  DATE:        17, May 2011
+  VERSION:     2.0.1
 */
 
 #include <stdio.h>
@@ -17,40 +20,101 @@
 
 #define ARGS 3 // Number of Maximum Arguments (1 means no arguments!)
 #define TITLESCN "Correlation Dimension" // Program Title
-#define VER "0.1" // Version of the code
+#define VER "2.0.1" // Version of the code
 #define ANO "2011" // Date of code
-#define MAXDATA 25000  //Maximum Data Input
+#define MAXDATA 4100  //Maximum Data Input
 #define CHAPER 20 // Number of allowed characters
-#define PASO 0.005 // the radius for neighbor separation
-#define LIMITE 10.0 //Test
+#define PASO 0.05 // The minimum radius for neighbor separation
+#define LIMITE 10.0 // The Maximum radios for neighbor separation
+#define MAXEMB 20 // Maximum Embedding Dimension
+
+
+double corsum(double data[],int size, int dim, double e)
+{
+  /** i recorre la SdT con j un paso más adelante como
+  dice la ecuación
+      C(e)=(2/(N(N-1)))Sum_i Sum_{j=i+1}  
+  */
+  double csum,norm=0,sum=0;
+  int i,j=1,d;
+  for(i=0;i<size;i+=dim)
+    {
+      for(j=i+dim;j<size;j+=dim)
+	{
+	  for(d=0;d<dim;d++){
+	    norm+=pow(data[i+d]-data[j+d],2);
+	    //printf("\n data[%d] %lf , data[%d] %lf\n",i+d,data[i+d],j,data[j+d]);
+	   
+	  }
+	  sum+=heaviside(e-norm);
+	  // printf("\n norm= %lf \t sum = %lf",norm,sum);
+	  norm=0;
+	}
+    }
+  csum=( 2.0/(size*(size-1.0)) )*sum;
+  //printf("sum = %lf size=%d \t csum=%.19lf",sum,size,csum );
+  return csum;
+}
+
+
+void datadquire(char *filename,double x[],int *Nmax)
+{
+  int N,i,j,cont;
+  FILE *filedata;
+
+  opendatafile(&filedata,filename,"r"); //open the file for reading	
+  cont=0; //initialize counter
+  i=0;
+  j=0;
+  N=0;
+  while(!feof(filedata)) //checks if the end of file is reached
+    {
+     	  N=N+1;
+	  fscanf(filedata,"%lf\n",&x[i]);
+	  (" * Reading line %d : x[%d] %lf\n",N,i,j+1,x[i]);
+     
+      i=i+1;
+    }
+  *Nmax=N;
+  fclose(filedata);
+}
+
+
+  /* **************************  MAIN FUNCTION ************************** */
+
 
 main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name argv[1]= first argument and so on
 {
   /* This section is made for argument validation */
 	if(argc > ARGS)
 	  {
-		printf("Too many arguments supplied.\n");
-	        printf(" Usage\'$ %s file-with-data.ext\' embedding-dimension\n\n",argv[0]);
+	    printf("Too many arguments supplied.\n");
+	    printf(" Usage\'$ %s file-with-data.ext\' embedding-dimension\n",argv[0]);
+	    printf(" If embedding-dimension = 0 the program makes various embeddings on \n file-with-data\n\n");
 	  }
 	else if (argc<ARGS)
 	  {
-	  
-		printf("Some arguments expected.\n");
-                printf(" Usage\'$ %s file-with-data.ext\' embedding-dimension\n\n",argv[0]);
-	  }
-
-
+	    
+	    printf("Some arguments expected.\n");
+	    printf(" Usage\'$ %s file-with-data.ext\' embedding-dimension\n",argv[0]);
+	    printf(" If embedding-dimension = 0 the program makes various embeddings on \n file-with-data\n\n");           
+ 	  }
+	
 	/* Here begins the interesting part */
 
-//variable definition
 
-	double csum,D,psum,c,ns,epsilon;
+
+	//variable definition
+
+	double D,psum,c,ns,epsilon;
         int cont,N,i,imax,j,jmax,dim;  // int max value 2,147,483,647 use long int for more data
 	char dimarg[CHAPER],originfn[CHAPER],resp[0],filename[CHAPER],fileext[CHAPER];
-	time_t t1,t2;
+	time_t t1,t2,t3,t4;
+
+	double x[MAXDATA]; //Declare the emdending vector
 
 
-	FILE *origin;
+
 	FILE *salida;
 	
 	characternumber(argv[1],CHAPER); //Confirm Character allowed values
@@ -60,59 +124,95 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	strcpy(dimarg,argv[2]);
 
 	dim=atoi(dimarg);
-
-
-	double x[MAXDATA][dim],aij[dim],nor[2*MAXDATA]; //Declare the emdending vector
-
-	system("clear");
+	
+	double csum;
+	
+	system("clear"); //clear screen
 	pimpi(TITLESCN,25); //pimps start up
-	
+
+	/* ************************** IF NO DIMENSION GIVEN ************************** */
+
+	if (dim==0)
+	  {
+	    printf("\n This tool will calculate the correlation sum \n And the correlation dimension...\n\n");
+	    printf(" * Data origin file: \'%s\'\n\n",originfn);
+	    printf(" [!] I'll make different embeddings and then calculate the convergence\n   of the correlation sum for various epsilon values\n\n");
+	    printf(" * Epsilon values range : %lf to %lf\n",PASO,LIMITE);
+	    printf(" * Epsilon steps: %lf\n\n",PASO);
+
+	    (void)time(&t3); 
+
+	    datadquire(originfn,x,&N);
+	    
+	    printf("\n * Total Readed Data Lines : %d \n",N);
+
+	    dim=1;
+
+	    strcpy(filename,strtok(argv[1],".")); // separate data files
+	    strcpy(fileext,strstr(originfn,"."));
+	    
+	    strcpy(filename,strcat(filename,"-cor")); //create a filename
+	   
+	    strcat(filename,fileext);
+	    opendatafile(&salida,filename,"w");
+
+	    while(dim<MAXEMB+1)
+	      {
+		(void) time(&t1);
+		printf("\n * Making an embedding of %d of %d \n",dim,MAXEMB);
+		printf("\n * Calculating correlation sum now...\n \t It will took a while, be patient...\n");
+		fprintf(salida,"### Embedding dimension = %d\n",dim);
+		epsilon=LIMITE;
+		
+
+
+		while (epsilon>PASO)
+		  {
+		    csum=corsum(x,N,dim,epsilon);
+		    
+		    D=-log(csum)/log(epsilon);
+
+		    fprintf(salida,"%lf  %.19lf %.19lf\n",epsilon,csum,D);
+
+		    //printf("\n * Correlation sum now: %.19lf\n",csum);
+
+		    epsilon=epsilon-PASO;
+		  }
+		fprintf(salida,"\n");
+		dim=dim+1;
+		
+		(void)time(&t2); 
+		
+		printf("\n * It took me %ld seconds to process the data",(t2-t1));
+	      }
+	    
+	    (void)time(&t4); 
+	    printf("\n * It took %ld minutes to overall process \n",(t4-t3)/60);
+	    pimpe(TITLESCN,25);
+	    exit(0);
+	  }
+
+
+	/* **************************  DIMENSION GIVEN ************************** */
+
+	else
+	  {
 	printf("\n This tool will calculate the correlation sum \n And the correlation dimension...\n\n");
-	printf(" * Data origin file: \'%s\'\n",originfn);
-	
-	
+	printf(" * Data origin file: \'%s\'\n\n",originfn);
 	printf(" * Embedding dimension: %d\n",dim);
+	printf(" [!] I'll calculate the convergence of the correlation sum for various epsilon values...\n\n");
+	printf(" * Epsilon values range : %lf to %lf\n",PASO,LIMITE);
+	printf(" * Epsilon steps: %lf\n\n",PASO);
 	
-	
+
 	/* Data Reading */
 	
-	(void) time(&t1); // chronometrize
 
-	opendatafile(&origin,originfn,"r"); //open the file for reading	
-
-
-	/*printf(" Are you sure you want to continue?[y/n]:");
-	scanf("%c",&resp);
-	if (resp[0]=='y')
-	{*/
-
-
-	    cont=0; //initialize counter
-	    i=0;
-	    j=0;
-	    N=0;
-	    while(!feof(origin)) //checks if the end of file is reached
-	      {
-		for(j=0;j<dim;j++)
-		  {
-		    N=N+1;
-		    fscanf(origin,"%lf\n",&x[i][j]);
-		    //printf(" * Reading line %d : x[%d][%d] %lf\n",N,i+1,j+1,x[i][j]);
-		  }
-		  
-		  i=i+1;
-	      }
-	    fclose(origin);
-
-
-
-	    printf("\n * Total Readed Data Lines : %d\n",N);
-	    printf("\n * Calculating correlation sum now...\n");
-
-  
+	
+       
 	    /* Calculate vector the difference */
 
-
+	/*
 	    imax=i;
 	    jmax=j;
 	    // N=0;
@@ -149,9 +249,9 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 		strcpy(filename,strcat(filename,"-cor")); //create a filename
 		strcat(filename,fileext);
 		opendatafile(&salida,filename,"w");
-
-	    /* Calculate the correlation Sum */
-
+	*/
+		/* Calculate the correlation Sum */
+	/*
 	    epsilon=PASO;
 	    
 	    while(epsilon<LIMITE)
@@ -198,7 +298,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 		epsilon=epsilon + PASO;
 	      }
 	    fclose(salida);
-		/*
+
 		printf("\n\n\t[?] Save results to output file \'%s\'? [y/n]: ",filename);
 		scanf("%c",&resp);
 		
@@ -248,7 +348,14 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 		    
 		  }
 	      }
-	      //} */
+	      //} 
+*/
+	  }
+	
+
+	
+
+
 		pimpe(TITLESCN,25);
 		
 		exit(0);
