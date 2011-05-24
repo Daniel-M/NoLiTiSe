@@ -5,7 +5,7 @@
 	       Usage $./statistical-main.out file-with-data.ext max-tau-separation.
   AUTHOR:      Daniel Mejia Raigosa
   DATE:        24, May 2011
-  VERSION:     1.1.2 
+  VERSION:     1.2.1 
 */
 
 #include <stdio.h>
@@ -17,7 +17,7 @@
 
 #define ARGS 3 // Number of Maximum Arguments (1 means no arguments!)
 #define TITLESCN "Statistical Properties" // Program Title
-#define VER "1.1.2" // Version of the code
+#define VER "1.2.1" // Version of the code
 #define ANO "2011" // Date of code
 #define MAXDATA 4100  //Maximum Data Input
 #define CHAPER 20 // Number of allowed characters
@@ -77,7 +77,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	//variable definition
 
 	double x[MAXDATA],autocor,mean,variance;
-        int cont,N,i,MAXT,tau;  // int max value 2,147,483,647 use long int for more data
+        int cont,N,MAXT,tau;  // int max value 2,147,483,647 use long int for more data
 	char originfn[CHAPER],filename[CHAPER],fileext[CHAPER];
 
 	FILE *salida;
@@ -112,11 +112,15 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	    for(cont=0;cont<N;cont=cont+2)
 	      {
 		 mean=x[cont]+x[cont+1]+mean;
-		variance=pow(x[cont]-mean,2) + variance;
-		 
 	      }
 
 	    mean=mean/N;
+	    
+	    for(cont=0;cont<N;cont++)
+	      {
+		variance=pow(x[cont]-mean,2) + variance;
+	      }
+
 	    variance=variance/(N-1);
 
 	    printf("\n * The calculated mean is: %.6lf\n",mean);  
@@ -144,15 +148,15 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 
 	    while(tau<MAXT+1)
 	      {
-		i=0;
+		cont=0;
 		autocor=0.0;
 		variance=0.0;
 
-		while(i<(N-tau))
+		while(cont<(N-tau))
 		  {
-		    autocor=(x[i]-mean)*(x[i+tau]-mean)+autocor;
-		    variance=pow(x[i]-mean,2) + variance;
-		    i=i+1;
+		    autocor=(x[cont]-mean)*(x[cont+tau]-mean)+autocor;
+		    variance=pow(x[cont]-mean,2) + variance;
+		    cont=cont+1;
 		  }
 		
 		variance=variance/(N-tau);
