@@ -5,7 +5,7 @@
 	       Usage $./statistical-main.out file-with-data.ext max-tau-separation.
   AUTHOR:      Daniel Mejia Raigosa
   DATE:        24, May 2011
-  VERSION:     1.2.1 
+  VERSION:     2.1.1 
 */
 
 #include <stdio.h>
@@ -19,35 +19,9 @@
 #define TITLESCN "Statistical Properties" // Program Title
 #define VER "1.2.1" // Version of the code
 #define ANO "2011" // Date of code
-#define MAXDATA 4100  //Maximum Data Input
-#define CHAPER 20 // Number of allowed characters
-
 #define MINT 1 //Minimal tau
 #define PASO 1  //Step of tau
 //#define MAXT 200 //Max tau
-
-
-void datadquire(char *filename,double x[],int *Nmax)
-{
-  int N,i,j,cont;
-  FILE *filedata;
-
-  opendatafile(&filedata,filename,"r"); //open the file for reading	
-  cont=0; //initialize counter
-  i=0;
-  j=0;
-  N=0;
-  while(!feof(filedata)) //checks if the end of file is reached
-    {
-     	  N=N+1;
-	  fscanf(filedata,"%lf\n",&x[i]);
-	  (" * Reading line %d : x[%d] %lf\n",N,i,j+1,x[i]);
-     
-      i=i+1;
-    }
-  *Nmax=N;
-  fclose(filedata);
-}
 
 
   /* **************************  MAIN FUNCTION ************************** */

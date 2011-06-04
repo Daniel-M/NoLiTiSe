@@ -7,8 +7,8 @@
 	       #define MAXDATA
       
   AUTHOR:      Daniel Mejia Raigosa
-  DATE:        17, May 2011
-  VERSION:     2.1.1
+  DATE:        17, May 2011 (Date of Creation)
+  VERSION:     2.2.2
 */
 
 #include <stdio.h>
@@ -18,14 +18,10 @@
 
 #include "commonroutines.c"
 
-#define ARGS 7 // Number of Maximum Arguments (1 means no arguments!)
+#define ARGS 6 // Number of Maximum Arguments (1 means no arguments!)
 #define TITLESCN "Correlation Dimension" // Program Title
-#define VER "2.0.1" // Version of the code
+#define VER "2.2.1" // Version of the code
 #define ANO "2011" // Date of code
-#define MAXDATA 4100  //Maximum Data Input
-#define CHAPER 20 // Number of allowed characters
-// #define PASO 0.05 // The minimum radius for neighbor separation
-// #define LIMITE 10.0 // The Maximum radius for neighbor separation
 #define MAXEMB 20 // Maximum Embedding Dimension
 
 
@@ -56,30 +52,6 @@ double corsum(double data[],int size, int dim, double e)
   return csum;
 }
 
-
-void datadquire(char *filename,double x[],int *Nmax)
-{
-  int N,i,j,cont;
-  FILE *filedata;
-
-  opendatafile(&filedata,filename,"r"); //open the file for reading	
-  cont=0; //initialize counter
-  i=0;
-  j=0;
-  N=0;
-  while(!feof(filedata)) //checks if the end of file is reached
-    {
-     	  N=N+1;
-	  fscanf(filedata,"%lf\n",&x[i]);
-	  (" * Reading line %d : x[%d] %lf\n",N,i,j+1,x[i]);
-     
-      i=i+1;
-    }
-  *Nmax=N;
-  fclose(filedata);
-}
-
-
   /* **************************  MAIN FUNCTION ************************** */
 
 
@@ -89,18 +61,18 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	if(argc > ARGS)
 	  {
 	    printf("Too many arguments supplied.\n");
-	    printf(" Usage\'$ %s file-with-data.ext\' dim r R e E \n",argv[0]);
-	    printf("\n \t dim - Embedding Dimension\n \t r - Minimum neighbor radious\n \t R - Maximum neighbor radious\n \t e - Min epsilon\n \t E - Max epsilon\n");
+	    printf(" Usage\'$ %s file-with-data.ext\' dim r R e\n",argv[0]);
+	    printf("\n \t dim - Embedding Dimension\n \t r - Minimum neighbor radious\n \t R - Maximum neighbor radious\n \t e - Epsilon step\n");
 	    printf(" If embedding-dimension = 0 the program makes various embeddings on \n file-with-data\n\n");
 	    exit(1);
 	  }
 	else if (argc<ARGS)
 	  {
 	    
-	    printf("Some arguments expected.\n");
-	    printf(" Usage\'$ %s file-with-data.ext\' dim r R e E \n",argv[0]);
-	    printf("\n \t dim - Embedding Dimension\n \t r - Minimum neighbor radious\n \t R - Maximum neighbor radious\n \t e - Min epsilon\n \t E - Max epsilon\n");
-	    printf(" If embedding-dimension = 0 the program makes various embeddings on \n file-with-data\n\n");        
+	printf("Some arguments expected.\n");
+	    printf(" Usage\'$ %s file-with-data.ext\' dim r R e\n",argv[0]);
+	    printf("\n \t dim - Embedding Dimension\n \t r - Minimum neighbor radious\n \t R - Maximum neighbor radious\n \t e - Epsilon step\n");
+	    printf(" If embedding-dimension = 0 the program makes various embeddings on \n file-with-data\n\n");
 	    exit(1);
  	  }
 	
@@ -110,7 +82,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 
 	//variable definition
 
-	double D,epsilon,csum,x[MAXDATA],PASO,LIMITE;
+	double D,epsilon,csum,x[MAXDATA],MINE,PASO,LIMITE;
         int cont,N,i,j,dim,DIM;  // int max value 2,147,483,647 use long int for more data
 	char dimarg[CHAPER],originfn[CHAPER],filename[CHAPER],fileext[CHAPER];
 	time_t t1,t2,t3,t4;
@@ -124,15 +96,20 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	strcpy(dimarg,argv[2]);
 
 	dim=atoi(argv[2]);	
-	PASO=atof(argv[3]);
+	MINE=atof(argv[3]);
 	LIMITE=atof(argv[4]);
+	PASO=atof(argv[5]);
 
 	if(PASO<=0)
 	  {
 	    PASO=0.01;
 	  }
+	if(MINE<=0)
+	  {
+	    MINE=0.01;
+	  }
 
-	if(LIMITE<=0 || LIMITE>100)
+	if(LIMITE<=0 || LIMITE>1100)
 	  {
 	    LIMITE=20;
 	  }
@@ -152,7 +129,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	    printf(" * Data origin file: \'%s\'\n\n",originfn);
 	    printf(" * Maximal Embedding dimension: %d\n",MAXEMB);
 	    printf(" [!] I'll make different embeddings and then calculate the convergence\n   of the correlation sum for various epsilon values\n\n");
-	    printf(" * Epsilon values range : %lf to %lf \t steps = %lf\n",PASO,LIMITE,PASO);
+	    printf(" * Epsilon values range : %lf to %lf \t step = %lf\n",MINE,LIMITE,PASO);
 
 	    (void)time(&t3); 
 
@@ -180,7 +157,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 		
 
 
-		while (epsilon>PASO)
+		while (epsilon>MINE)
 		  {
 		    csum=corsum(x,N,dim,epsilon);
 		    
@@ -221,7 +198,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	    printf(" * Data origin file: \'%s\'\n\n",originfn);
 	    printf(" * Embedding dimension: %d\n",dim);
 	    printf(" [!] I'll calculate the convergence  of the correlation sum \n     for various epsilon values\n\n");
-	    printf(" * Epsilon values range : %lf to %lf - steps = %lf\n",PASO,LIMITE,PASO);
+	    printf(" * Epsilon values range : %lf to %lf - step = %lf\n",MINE,LIMITE,PASO);
 	
 
 
@@ -246,7 +223,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 
 	    epsilon=LIMITE;
 	    
-	    while (epsilon>PASO)
+	    while (epsilon>MINE)
 	      {
 		
 		csum=corsum(x,N,dim,epsilon);

@@ -4,13 +4,16 @@
       
   AUTHOR:      Daniel Mejia Raigosa
   DATE:        17, May 2011
-  VERSION:     1.4
+  VERSION:     2.1.1
 */
 
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define MAXDATA 10000  //Maximum Data Input
+#define CHAPER 20 // Number of allowed characters
 
 
 //***************************************************************************
@@ -126,15 +129,16 @@ void opendatafile(FILE **filepointer,char *filename,char *option)
 
 
 /* This function Test the correct use of the character number */
-void characternumber(char *caracter,int CHAPER)
+
+void characternumber(char *caracter,int CHAPERA)
 {
   int longitud;
   longitud=strlen(caracter);
-  if (longitud>CHAPER)
+  if (longitud>CHAPERA)
     {
     system("clear");
     printf("===============FATAL ERROR======================="); 
-    printf("\n Max input arguments character allowed are %d\n",CHAPER);
+    printf("\n Max input arguments character allowed are %d\n",CHAPERA);
     printf(" The argument %s \n character lenght was %d !!\n",caracter,longitud);
     printf(" Please use less charactares to success.\n Exiting...\n");
     printf("=================================================\n");
@@ -169,3 +173,32 @@ int heaviside(double x)
 
 
 //***************************************************************************
+
+
+void datadquire(char *filename,double x[],int *Nmax)
+{
+  char info[25];
+  int N,i,j,cont;
+  FILE *filedata;
+
+  opendatafile(&filedata,filename,"r"); //open the file for reading	
+  cont=0; //initialize counter
+  i=0;
+  j=0;
+  N=0;
+  while(!feof(filedata)) //checks if the end of file is reached
+    {  
+      N=N+1;
+      fscanf(filedata,"%s\n",&info);
+      x[i]=atof(info);
+      printf(" * Reading line %d : x[%d] %.10lf\n",N,i,j+1,x[i]);
+      i=i+1;
+    }
+  *Nmax=N;
+  fclose(filedata);
+}
+
+
+//***************************************************************************
+
+
