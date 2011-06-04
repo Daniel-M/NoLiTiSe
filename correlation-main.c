@@ -18,14 +18,14 @@
 
 #include "commonroutines.c"
 
-#define ARGS 6 // Number of Maximum Arguments (1 means no arguments!)
+#define ARGS 7 // Number of Maximum Arguments (1 means no arguments!)
 #define TITLESCN "Correlation Dimension" // Program Title
 #define VER "2.2.1" // Version of the code
 #define ANO "2011" // Date of code
 #define MAXEMB 20 // Maximum Embedding Dimension
+#define THEILER 10 // Theiler Correction for Correlation Algorithm
 
-
-double corsum(double data[],int size, int dim, double e)
+double corsum(double data[],int size, int dim, int tau,double e)
 {
   /** i recorre la SdT con j un paso más adelante como
   dice la ecuación
@@ -33,17 +33,23 @@ double corsum(double data[],int size, int dim, double e)
   */
   double csum,norm=0,sum=0;
   int i,j=1,d;
-  for(i=0;i<size;i+=dim)
+  for(i=0;i<size;i+=1)
     {
-      for(j=i+dim;j<size;j+=dim)
+      for(j=(i+dim);j<size;j+=dim)
 	{
-	  for(d=0;d<dim;d++){
-	    norm+=pow(data[i+d]-data[j+d],2);
-	    //printf("\n data[%d] %lf , data[%d] %lf\n",i+d,data[i+d],j,data[j+d]);
-	   
+	  for(d=0;d<dim;d++)
+	    {
+	      norm+=pow(data[i+(dim-d)*tau]-data[j+(dim-d)*tau],2);
+
+	    // Apply the Theiler Correction W(THEILER) such that |j-i| > W
+
+	       if( abs(j-i)<THEILER )
+	         {
+		   j=j+THEILER;
+	         }
 	  }
 	  sum+=heaviside(e-norm);
-	  // printf("\n norm= %lf \t sum = %lf",norm,sum);
+
 	  norm=0;
 	}
     }
@@ -61,8 +67,8 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	if(argc > ARGS)
 	  {
 	    printf("Too many arguments supplied.\n");
-	    printf(" Usage\'$ %s file-with-data.ext\' dim r R e\n",argv[0]);
-	    printf("\n \t dim - Embedding Dimension\n \t r - Minimum neighbor radious\n \t R - Maximum neighbor radious\n \t e - Epsilon step\n");
+	    printf(" Usage\'$ %s file-with-data.ext\' dim t r R e\n",argv[0]);
+	    printf("\n \t dim - Embedding Dimension\n \t t Tau Sepparation\n \t r - Minimum neighbor radious\n \t R - Maximum neighbor radious\n \t e - Epsilon step\n");
 	    printf(" If embedding-dimension = 0 the program makes various embeddings on \n file-with-data\n\n");
 	    exit(1);
 	  }
@@ -70,8 +76,8 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	  {
 	    
 	printf("Some arguments expected.\n");
-	    printf(" Usage\'$ %s file-with-data.ext\' dim r R e\n",argv[0]);
-	    printf("\n \t dim - Embedding Dimension\n \t r - Minimum neighbor radious\n \t R - Maximum neighbor radious\n \t e - Epsilon step\n");
+	    printf(" Usage\'$ %s file-with-data.ext\' dim t r R e\n",argv[0]);
+	    printf("\n \t dim - Embedding Dimension\n \t t Tau Sepparation\n \t r - Minimum neighbor radious\n \t R - Maximum neighbor radious\n \t e - Epsilon step\n");
 	    printf(" If embedding-dimension = 0 the program makes various embeddings on \n file-with-data\n\n");
 	    exit(1);
  	  }
@@ -83,8 +89,8 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	//variable definition
 
 	double D,epsilon,csum,x[MAXDATA],MINE,PASO,LIMITE;
-        int cont,N,i,j,dim,DIM;  // int max value 2,147,483,647 use long int for more data
-	char dimarg[CHAPER],originfn[CHAPER],filename[CHAPER],fileext[CHAPER];
+        int cont,N,i,j,dim,tau;  // int max value 2,147,483,647 use long int for more data
+	char originfn[CHAPER],filename[CHAPER],fileext[CHAPER];
 	time_t t1,t2,t3,t4;
 
 	FILE *salida;
@@ -93,12 +99,12 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	characternumber(argv[2],CHAPER);
 	
 	strcpy(originfn,argv[1]);   //Convert file names
-	strcpy(dimarg,argv[2]);
-
-	dim=atoi(argv[2]);	
-	MINE=atof(argv[3]);
-	LIMITE=atof(argv[4]);
-	PASO=atof(argv[5]);
+	
+	dim=atoi(argv[2]);
+	tau=atoi(argv[3]);
+	MINE=atof(argv[4]);
+	LIMITE=atof(argv[5]);
+	PASO=atof(argv[6]);
 
 	if(PASO<=0)
 	  {
@@ -159,7 +165,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 
 		while (epsilon>MINE)
 		  {
-		    csum=corsum(x,N,dim,epsilon);
+		    csum=corsum(x,N,dim,5,epsilon);
 		    
 		    D=-log(csum)/log(epsilon);
 
@@ -194,9 +200,11 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	else
 	  {
 
-	    printf("\n This tool will calculate the correlation sum \n And the correlation dimension...\n\n");
+	    printf("\n This tool will calculate the correlation sum \n And the correlation dimension,\n Making a Time Delay Embbeding");
 	    printf(" * Data origin file: \'%s\'\n\n",originfn);
 	    printf(" * Embedding dimension: %d\n",dim);
+	    printf(" * Time Lag : %d\n",tau);
+
 	    printf(" [!] I'll calculate the convergence  of the correlation sum \n     for various epsilon values\n\n");
 	    printf(" * Epsilon values range : %lf to %lf - step = %lf\n",MINE,LIMITE,PASO);
 	
@@ -226,7 +234,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	    while (epsilon>MINE)
 	      {
 		
-		csum=corsum(x,N,dim,epsilon);
+		csum=corsum(x,N,dim,5,epsilon);
 		
 		D=-log(csum)/log(epsilon);
 		
