@@ -96,7 +96,6 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	FILE *salida;
 	
 	characternumber(argv[1],CHAPER); //Confirm Character allowed values
-	characternumber(argv[2],CHAPER);
 	
 	strcpy(originfn,argv[1]);   //Convert file names
 	

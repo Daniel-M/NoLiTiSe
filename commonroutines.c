@@ -191,14 +191,14 @@ void datadquire(char *filename,double x[],int *Nmax)
       N=N+1;
       fscanf(filedata,"%s\n",&info);
       x[i]=atof(info);
-      printf(" * Reading line %d : x[%d] %.10lf\n",N,i,j+1,x[i]);
+      //      printf(" * Reading line %d : x[%d] %.10lf\n",N,i,j+1,x[i]);
       i=i+1;
     }
   *Nmax=N;
   fclose(filedata);
+  //  printf(" * Total Readed Lines %d\n",N);
 }
 
 
 //***************************************************************************
-
 

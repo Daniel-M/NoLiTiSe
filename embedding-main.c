@@ -14,7 +14,7 @@
 */
 
 #include <stdio.h>
-#include <math.h>ç
+#include <math.h>
 #include <stdlib.h>
 #include "commonroutines.c"
 
@@ -22,8 +22,6 @@
 #define TITLESCN "Embedding" // Program Title
 #define VER  "1.3" // Code Version 
 #define ANO "2011" // Date of Code 
-#define CHAPER 20 // Number of allowed characters
-#define MAXDATA 10000  //Maximum Data Input
 
 
 /* HERE COMES THE MAIN FUNCTION */
