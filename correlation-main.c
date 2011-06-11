@@ -22,7 +22,7 @@
 #define TITLESCN "Correlation Dimension" // Program Title
 #define VER "2.2.1" // Version of the code
 #define ANO "2011" // Date of code
-#define MAXEMB 20 // Maximum Embedding Dimension
+#define MAXEMB 10 // Maximum Embedding Dimension
 #define THEILER 10 // Theiler Correction for Correlation Algorithm
 
 double corsum(double data[],int size, int dim, int tau,double e)
@@ -35,7 +35,7 @@ double corsum(double data[],int size, int dim, int tau,double e)
   int i,j=1,d;
   for(i=0;i<size;i+=1)
     {
-      for(j=(i+dim);j<size;j+=dim)
+      for(j=(i+THEILER);j<size;j+=THEILER)
 	{
 	  for(d=0;d<dim;d++)
 	    {
@@ -88,9 +88,9 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 
 	//variable definition
 
-	double D,epsilon,csum,x[MAXDATA],MINE,PASO,LIMITE;
+	double epsilon,csum,x[MAXDATA],MINE,PASO,LIMITE;
         int cont,N,i,j,dim,tau;  // int max value 2,147,483,647 use long int for more data
-	char originfn[CHAPER],filename[CHAPER],fileext[CHAPER];
+	char originfn[CHAPER],filename[CHAPER],fileext[CHAPER],dimarg[2];
 	time_t t1,t2,t3,t4;
 
 	FILE *salida;
@@ -148,16 +148,18 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	    strcpy(fileext,strstr(originfn,"."));
 	    
 	    strcpy(filename,strcat(filename,"-cor")); //create a filename
-	   
+	    
+	    strcat(filename,dimarg);
+
 	    strcat(filename,fileext);
 	    opendatafile(&salida,filename,"w");
 
 	    while(dim<MAXEMB+1)
 	      {
 		(void) time(&t1);
-		printf("\n * Making an embedding of %d of %d \n",dim,MAXEMB);
+		printf("\n * Making Embedding %d of %d \n",dim,MAXEMB);
 		printf("\n * Calculating correlation sum now...\n \t It will took a while, be patient...\n");
-		fprintf(salida,"### Embedding dimension = %d\n",dim);
+		fprintf(salida,"### Embedding dimension = %d\n### log(e) log(C(e))\n",dim);
 		epsilon=LIMITE;
 		
 
@@ -165,12 +167,8 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 		while (epsilon>MINE)
 		  {
 		    csum=corsum(x,N,dim,5,epsilon);
-		    
-		    D=-log(csum)/log(epsilon);
 
-		    fprintf(salida,"%lf  %.19lf %.19lf\n",epsilon,csum,D);
-
-		    //printf("\n * Correlation sum now: %.19lf\n",csum);
+		    fprintf(salida,"%.6E  %.6E\n",log(epsilon),log(csum));
 
 		    epsilon=epsilon-PASO;
 		  }
@@ -186,7 +184,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	    
 	    (void)time(&t4); 
 	    
-	    printf("\n * Results saved on file \'%s\'\n",filename);
+	    printf("\n\n * Results saved on file \'%s\'\n",filename);
 	    printf("\n * It took %ld minutes to overall process \n",(t4-t3)/60);
 	    
 	    pimpe(TITLESCN,25);
@@ -226,7 +224,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	    (void) time(&t1);
 
 	    printf("\n * Calculating correlation sum now...\n \t It will took a while, be patient...\n");
-	    fprintf(salida,"### Embedding dimension = %d\n",dim);
+	    fprintf(salida,"### Embedding dimension = %d\n### log(e) log(C(e))\n",dim);
 
 	    epsilon=LIMITE;
 	    
@@ -235,19 +233,15 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 		
 		csum=corsum(x,N,dim,5,epsilon);
 		
-		D=-log(csum)/log(epsilon);
-		
-		fprintf(salida,"%lf  %.19lf %.19lf\n",epsilon,csum,D);
-		
-		//printf("\n * Correlation sum now: %.19lf\n",csum);
-		
+		fprintf(salida,"%.6E  %.6E\n",log(epsilon),log(csum));
+				
 		epsilon=epsilon-PASO;
 	      }
 
 	    fclose(salida);
 	    (void)time(&t2); 
 	    
-	    printf("\n * Results saved on file \'%s\'\n",filename);
+	    printf("\n\n * Results saved on file \'%s\'\n",filename);
 	    
 	    (void)time(&t4);
  

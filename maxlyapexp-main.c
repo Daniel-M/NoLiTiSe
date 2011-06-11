@@ -1,5 +1,5 @@
 /*
-  DESCRIPTION: This Code
+  DESCRIPTION: Algorithm Sprot Page 253
       
        AUTHOR: Daniel Mejia Raigosa
          DATE: 
@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include "commonroutines.c"
 
-#define ARGS 4 // Number of Maximum Arguments (1 means no arguments!)
-#define TITLESCN "Lyapunov Exponent"
+#define ARGS 3 // Number of Maximum Arguments (1 means no arguments!)
+#define TITLESCN "Maximal Lyapunov Exponent"
 
 main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name argv[1]= first argument and so on
 {
@@ -20,10 +20,14 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	if( argc > ARGS )
 	  {
 		printf("Too many arguments supplied.\n");
+		printf(" Usage\'$ %s file-with-data.ext\' dim \n",argv[0]);
+		printf("\n \t dim - Embedding Dimension\n \t t - Time for lyapunov exponent evaluation\n");
 	  }
 	else if (argc < ARGS)
 	  {
 		printf("Some arguments expected.\n");
+		printf(" Usage\'$ %s file-with-data.ext\' dim \n",argv[0]);
+		printf("\n \t dim - Embedding Dimension\n \t t - Time for lyapunov exponent evaluation\n");
 	  }
 
 	double ts[MAXDATA],lyap,sum1,sum2;
@@ -38,16 +42,12 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	strcpy(originfn,argv[1]);   //Convert file names
 	
 	m=atoi(argv[2]);
-	k=atoi(argv[3]);
 	
 	system("clear"); //clear screen
 	pimpi(TITLESCN,25); //pimps start up
 
 	(void)time(&t3); 
 	
-
-
-
 	datadquire(originfn,ts,&N);
 
 
@@ -67,33 +67,34 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	printf(" \n Calculating %d Exponents for %s\n",N,originfn);
 	
 	fprintf(salida,"### Lyapunov Exponent of data set %s\n",originfn);
+
 	
-	    while(l<N-k-1)
-	      {
+	for(l=0;l<(N-k-m-1);l++)
+	    {
 		n=m;
+		sum2=0;
 		
-		while(n<N-k)
+		for(n=m;n<(N-k);n++)
 		  {
 		    sum1=0;
-		    sum2=0;
-		    j=0;
-		    while(j<m-1)
+		    
+		    for(j=0;j<m;j++)
 		      {
 			sum1=pow(ts[l-j+k]-ts[n-j+k],2)+sum1;
-			//printf(" suma1 %lf\n",sum1);
 			j=j+1;
+
 		      }
 		    
-		    sum2=log(sum1)+sum2;
-		    //		printf(" suma2 %lf\n",sum2);
-		    n=n+1;
+		    sum2+=log(sum1);
+		    
 		  } 
 		
 		lyap=sum2/(2.0*(N-k-m+1));
-		fprintf(salida,"%d \t %lf \t %lf \t  %lf\n",l,sum1,sum2,lyap);
+
+		fprintf(salida,"%d \t %lf \t %lf \t  %lf\n",l,sum2,lyap);
 		//	printf(" \n Exponent for %d point calculated as %lf\n",l,lyap);
 		l=l+1;
-	      }
+	       }
 
 
 

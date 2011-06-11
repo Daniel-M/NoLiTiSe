@@ -133,7 +133,7 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 		    cont=cont+1;
 		  }
 		
-		variance=variance/(N-tau);
+		//	variance=variance/(N-tau);
 		autocor=autocor/variance;
 
 		fprintf(salida,"%d\t%lf\n",tau,autocor);
