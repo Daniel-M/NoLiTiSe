@@ -10,7 +10,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
-#include <complex.h>
 
 #include "commonroutines.c"
 
@@ -18,11 +17,8 @@
 #define TITLESCN "Discrete Fourier Transform" // Program Title
 #define VER "0.0.1" // Version of the code
 #define ANO "2011" // Date of code
-#define dt 0.0057600368642359307 // Sampling Interval (data series)
 
 
-#undef I
-#define j _Complex_I
 
   /* **************************  MAIN FUNCTION ************************** */
 
@@ -43,29 +39,28 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 	    exit(1);
  	  }
   
-	double complex skbar,sum;
-	double sn[MAXDATA],pskbar[MAXDATA],k;
+	double skbar[1],sn[MAXDATA],norm,k,dt=0.0057600368642359307;
 	char originfn[CHAPER],filename[CHAPER], fileext[CHAPER];
 	
 	int N,i,l;
 	time_t t1,t2,t3,t4;
 
 	FILE *pspectrum;
+	FILE *ftransform;
 	
 	characternumber(argv[1],CHAPER); //Confirm Character allowed values
 
 	strcpy(originfn,argv[1]);   //Convert file names
  	      
+	pimpi(TITLESCN,25);
+
 	datadquire(originfn,sn,&N);
 
 	/* Make the transform */
 	
 	printf("\n * Creating data file");
-	
-	k=-N/2;
-	sum=0;
-	l=0;
-	
+       	
+	//open pspectrum
 	strcpy(filename,strtok(argv[1],".")); // separate data files
 	strcpy(fileext,strstr(originfn,"."));
 	
@@ -75,30 +70,68 @@ main(int argc,char *argv[]) // for input arguments, remeber argv[0]=program name
 
 	opendatafile(&pspectrum,filename,"w");
 
+	printf("\n * Saving Power Spectrum to \'%s\'\n",filename);
+
+	//open ftransform
+	strcpy(filename,strtok(argv[1],".")); // separate data files
+	strcpy(fileext,strstr(originfn,"."));
+	
+	strcpy(filename,strcat(filename,"-ftransform")); //create a filename
+	
+	strcat(filename,fileext);
+
+	opendatafile(&ftransform,filename,"w");
+
+	printf("\n * Saving Fourier Transform to \'%s\'\n",filename);
+
 	fprintf(pspectrum,"### Discriete Fourier Transform Power Spectrum\n");
+	fprintf(pspectrum,"### Data Origin : %s\n",argv[1]);
+	fprintf(pspectrum,"### Sampling interval dt = %.6E\n",dt);
+	fprintf(pspectrum,"### k/Ndt   S(k/Ndt)\n");
+
+	fprintf(ftransform,"### Discriete Fourier Transform coeficients\n");
+	fprintf(ftransform,"### k  k/Ndt  sum (real)sn*cos(2pi*k*n/N) (imaginary)sn*sin(2pi*k*n/N)\n");
 	
 	printf(" * Data origin file: \'%s\'\n\n",originfn);
-	printf("\n * Calculating the power spectrum");
-	
+
+      	printf("\n * Calculating the Power Spectrum and the Fourier Transform");
+
+	skbar[0]=0;  // Real part
+	skbar[1]=0; // Imaginary part
+
+	k=-N/2;
+
 	while(k<N/2.0)
 	  {
-	    for(i=1;i<N;i++)
+
+	    /* Fourier transform : sum sn cos() + i* sum sn*sin() */
+
+	    for(i=1;i<N;i++) // Real Part of Fourier Transform
 	      {
-		sum=sn[i-1]*cexp((2*M_PI*j*k*i)/N)+sum;
-
+		skbar[0]+=sn[i-1]*cos((2*M_PI*k*i)/N);
 	      }
+	    skbar[0]=skbar[0]/sqrt(N);
 
-	    skbar=sum/sqrt(N);
+	    for(i=1;i<N;i++) // Imaginary part of Fourier Transform
+	      {
+		skbar[1]+=sn[i-1]*sin((2*M_PI*k*i)/N);
+	      }
+	    skbar[1]=skbar[1]/sqrt(N);
 
 	    //printf("\n * %d %lf  Calculated: %lf",l,k, cabs(skbar));
+	    
+	    norm=pow(skbar[0],2)+pow(skbar[1],2);
 
-	    fprintf(pspectrum,"%lf %lf %lf\n",k/(N*dt),cabs(skbar),k);
+	    fprintf(pspectrum,"%.6E\t%.6E\n",k/(N*dt),norm);
+	    fprintf(ftransform,"%.6E\t%.6E\t%.6E\t%.6E\n",k,k/(N*dt),skbar[0],skbar[1]);
 	    k=k+1;
-	    l=l+1;
 	  }
 
 	fclose(pspectrum);
-	printf("\n * Power spectrum Calculated");
-	printf("\n * Results saved on file \'%s\'\n",filename);
+	fclose(ftransform);
+
+	printf("\n * Power spectrum and Fourier Transform Calculated!\n");
+	pimpe(TITLESCN,25);
+	exit(0);
 	
 } //End of Main Code
